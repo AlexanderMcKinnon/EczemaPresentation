@@ -1,12 +1,13 @@
 package com.example.calendarattempt4;
 import java.sql.*;
+import java.util.Date;
 import java.time.LocalDate;
 
 public class day {
     protected int Day_ID;
     protected int parent_ID;
     protected int child_ID;
-    protected LocalDate date;
+    protected Date date;
     protected String answers;
     String AUTH = null;
     Statement s;
@@ -14,9 +15,12 @@ public class day {
     public day(){
     }
 
-    public boolean check(int CID, LocalDate date, Statement s) throws SQLException {
+    public boolean check(int CID, int PID, Date date, Statement s) throws SQLException {
         this.s = s;
-        String sqlStr = "SELECT * FROM dates WHERE CID =\'"+CID+"\' and date =\'"+date+"\';";
+        this.parent_ID = PID;
+        this.child_ID = CID;
+        this.date = date;
+        String sqlStr = "SELECT * FROM dates WHERE CID =\'"+CID+"\' and DID =\'"+date+"\';";
         ResultSet rset=s.executeQuery(sqlStr);
         while(rset.next()) {
             this.Day_ID = rset.getInt("DID");

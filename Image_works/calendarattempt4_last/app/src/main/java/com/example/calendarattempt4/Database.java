@@ -1,5 +1,8 @@
 package com.example.calendarattempt4;
 
+import android.os.StrictMode;
+import android.util.Log;
+
 import java.sql.*;
 
 public class Database {
@@ -9,6 +12,11 @@ public class Database {
 
     public boolean connect()  {
         try {
+            if (android.os.Build.VERSION.SDK_INT > 9)
+            {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
             // Registers the drive
             Class.forName("org.postgresql.Driver");
             Connection conn= DriverManager.getConnection(dbUrl);
@@ -16,10 +24,14 @@ public class Database {
             return true;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            String stack = Log.getStackTraceString(e);
+            Log.d("DEBUGGG",stack);
             System.out.println("Could not find the database driver ");
             return false;
         } catch (SQLException e) {
             e.printStackTrace();
+            String stack = Log.getStackTraceString(e);
+            Log.d("DEBUGGG",stack);
             System.out.println("Could not connect to the database");
             return false;
         }

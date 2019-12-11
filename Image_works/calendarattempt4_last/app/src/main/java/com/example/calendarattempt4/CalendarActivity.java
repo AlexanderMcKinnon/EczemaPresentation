@@ -171,7 +171,7 @@ public class CalendarActivity extends AppCompatActivity {
     public void Go(View view) {//Add entry
         Intent intent = new Intent(CalendarActivity.this, MainActivity.class);
         String score = getScore();
-        try {main.makeDay(score); } catch (SQLException e) {e.printStackTrace();}
+        try {MainActivity.makeDay(score);} catch (SQLException e) {e.printStackTrace();}
         startActivity(intent);
     }
     public void Logo(View view){
