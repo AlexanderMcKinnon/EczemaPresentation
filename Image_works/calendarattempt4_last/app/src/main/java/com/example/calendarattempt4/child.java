@@ -41,6 +41,7 @@ public class child {
     public boolean create(String new_name, int parent_ID) throws SQLException {
         String sqlStr = "SELECT CID FROM children WHERE child_name =\'"+new_name+"\' and PID = \'"+parent_ID+"\';";
         ResultSet rset=s.executeQuery(sqlStr);
+        AUTH = null;
         while(rset.next()) {
             AUTH = rset.getString("CID");
         }

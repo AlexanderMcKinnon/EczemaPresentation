@@ -32,7 +32,7 @@ public class parent {
     public boolean login(String username, String password) throws SQLException {
         String sqlStr = "SELECT PID, email, Child_num, Child_ID_1, Child_ID_2, Child_ID_3  FROM parents WHERE username =\'"+username+"\' and password = \'"+password+"\';";
         ResultSet rset=s.executeQuery(sqlStr);
-
+        AUTH = null;
         while(rset.next()) {
             this.parent_ID = rset.getInt("PID");;
             this.email = rset.getString("email");

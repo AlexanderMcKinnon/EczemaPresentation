@@ -28,6 +28,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import static com.example.calendarattempt4.MainActivity.checkDay_on_state_change;
+
 /**
  * Created by ganesh on 6/10/2017.
  */
@@ -71,6 +73,16 @@ public class CalendarActivity extends AppCompatActivity {
     private int current_image_itchy;
     private int current_image_medicine;
     private int current_image_ointment;
+
+    private boolean toggle = true;
+    private boolean toggle_dry = false;
+    private boolean toggle_oozing = false;
+    private boolean toggle_bleeding = false;
+    private boolean toggle_flaking = false;
+    private boolean toggle_itchy = false;
+    private boolean toggle_medicine = false;
+    private boolean toggle_ointment = false;
+    private boolean togglers[] = {false,false,false,false,false,false,false,false};
 
     int[] images={R.drawable.cracking,R.drawable.cracking_clicked};
     int[] images_dry={R.drawable.dry,R.drawable.dry_clicked};
@@ -128,7 +140,74 @@ public class CalendarActivity extends AppCompatActivity {
                 String date = year + "/" + month + "/"+ dayOfMonth ;
                 Log.d(TAG, "onSelectedDayChange: yyyy/MM/dd:" + date);
                 date_chosen = date;
-
+                try {
+                    if (checkDay_on_state_change(date_chosen)) {
+                        String downloaded_ans = MainActivity.D.answers;
+                        char[] ans_char = new char[downloaded_ans.length()];
+                        for (int i = 0; i<downloaded_ans.length(); i++) {
+                            ans_char[i] = downloaded_ans.charAt(i);
+                            if(downloaded_ans.charAt(i) == '1') {
+                                togglers[i] = true;
+                            } else if (downloaded_ans.charAt(i) == '0') {
+                                togglers[i] = false;
+                            }
+                        }
+                    } else {
+                        for (int i = 0; i < togglers.length; i++){
+                            togglers[i] = false;
+                        }
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                imgview = findViewById(R.id.imageView);
+                if (togglers[0] == false) {
+                    imgview.setImageResource(R.drawable.cracking);
+                } else if (togglers[0] == true) {
+                    imgview.setImageResource(R.drawable.cracking_clicked);
+                }
+                dry_click=findViewById(R.id.imageView_dry);
+                if (togglers[1] == false) {
+                    dry_click.setImageResource(R.drawable.dry);
+                } else if (togglers[1] == true) {
+                    dry_click.setImageResource(R.drawable.dry_clicked);
+                }
+                oozing_click=findViewById(R.id.imageView_oozing);
+                if (togglers[2] == false) {
+                    oozing_click.setImageResource(R.drawable.oozing);
+                } else if (togglers[2] == true) {
+                    oozing_click.setImageResource(R.drawable.oozing_clicked);
+                }
+                bleeding_click=findViewById(R.id.imageView_bleeding);
+                if (togglers[3] == false) {
+                    bleeding_click.setImageResource(R.drawable.bleeding);
+                } else if (togglers[3] == true) {
+                    bleeding_click.setImageResource(R.drawable.bleeding_ticked);
+                }
+                flaking_click=findViewById(R.id.imageView_flaking);
+                if (togglers[4] == false) {
+                    flaking_click.setImageResource(R.drawable.flaking);
+                } else if (togglers[4] == true) {
+                    flaking_click.setImageResource(R.drawable.flaking_clicked);
+                }
+                itchy_click=findViewById(R.id.imageView_itchy);
+                if (togglers[5] == false) {
+                    itchy_click.setImageResource(R.drawable.itchy);
+                } else if (togglers[5] == true) {
+                    itchy_click.setImageResource(R.drawable.itchy_ticked);
+                }
+                medicine_click=findViewById(R.id.imageView_medicine);
+                if (togglers[6] == false) {
+                    medicine_click.setImageResource(R.drawable.medicine);
+                } else if (togglers[6] == true) {
+                    medicine_click.setImageResource(R.drawable.medicine_clicked);
+                }
+                ointment_click=findViewById(R.id.imageView_ointment);
+                if (togglers[7] == false) {
+                    ointment_click.setImageResource(R.drawable.ointment);
+                } else if (togglers[7] == true) {
+                    ointment_click.setImageResource(R.drawable.ointment_clicked);
+                }
             }
         });
     }
@@ -180,132 +259,193 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
     public void buttonclick(){
-        imgview=findViewById(R.id.imageView);
-        imgview2=findViewById(R.id.imageView);
-        imgview2.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view){
-                                            current_image++;
-                                            current_image=current_image % images.length;
-                                            imgview.setImageResource(images[current_image]);
-
-                                        }
-                                    }
+        imgview = findViewById(R.id.imageView);
+        if (togglers[0] == false) {
+            imgview.setImageResource(R.drawable.cracking);
+        } else if (togglers[0] == true) {
+            imgview.setImageResource(R.drawable.cracking_clicked);
+        }
+        imgview.setOnClickListener(new View.OnClickListener() {
+                                       @Override
+                                       public void onClick(View view){
+                                           if (togglers[0] == false) {
+                                               togglers[0] = true;
+                                               imgview.setImageResource(R.drawable.cracking_clicked);
+                                           } else if (togglers[0] == true) {
+                                               togglers[0] = false;
+                                               imgview.setImageResource(R.drawable.cracking);
+                                           }
+                                       }
+                                   }
         );
     }
 
     public void buttonclick_dry(){
-        dry=findViewById(R.id.imageView_dry);
         dry_click=findViewById(R.id.imageView_dry);
+        if (togglers[1] == false) {
+            dry_click.setImageResource(R.drawable.dry);
+        } else if (togglers[1] == true) {
+            dry_click.setImageResource(R.drawable.dry_clicked);
+        }
         dry_click.setOnClickListener(new View.OnClickListener() {
                                          @Override
                                          public void onClick(View view){
-                                             current_image_dry++;
-                                             current_image_dry=current_image_dry % images_dry.length;
-                                             dry.setImageResource(images_dry[current_image_dry]);
-
+                                             if (togglers[1] == false) {
+                                                 togglers[1] = true;
+                                                 dry_click.setImageResource(R.drawable.dry_clicked);
+                                             } else if (togglers[1] == true) {
+                                                 togglers[1] = false;
+                                                 dry_click.setImageResource(R.drawable.dry);
+                                             }
                                          }
                                      }
         );
     }
 
     public void buttonclick_oozing(){
-        oozing=findViewById(R.id.imageView_oozing);
         oozing_click=findViewById(R.id.imageView_oozing);
+        if (togglers[2] == false) {
+            oozing_click.setImageResource(R.drawable.oozing);
+        } else if (togglers[2] == true) {
+            oozing_click.setImageResource(R.drawable.oozing_clicked);
+        }
         oozing_click.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View view){
-                                                current_image_oozing++;
-                                                current_image_oozing=current_image_oozing % images_oozing.length;
-                                                oozing.setImageResource(images_oozing[current_image_oozing]);
-
+                                                if (togglers[2] == false) {
+                                                    togglers[2] = true;
+                                                    oozing_click.setImageResource(R.drawable.oozing_clicked);
+                                                } else if (togglers[2] == true) {
+                                                    togglers[2] = false;
+                                                    oozing_click.setImageResource(R.drawable.oozing);
+                                                }
                                             }
                                         }
         );
     }
 
     public void buttonclick_bleeding(){
-        bleeding=findViewById(R.id.imageView_bleeding);
         bleeding_click=findViewById(R.id.imageView_bleeding);
+        if (togglers[3] == false) {
+            bleeding_click.setImageResource(R.drawable.bleeding);
+        } else if (togglers[3] == true) {
+            bleeding_click.setImageResource(R.drawable.bleeding_ticked);
+        }
         bleeding_click.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View view){
-                                             current_image_bleeding++;
-                                             current_image_bleeding=current_image_bleeding % images_bleeding.length;
-                                             bleeding.setImageResource(images_bleeding[current_image_bleeding]);
-
-                                         }
-                                     }
-        );
-    }
-
-    public void buttonclick_flaking(){
-        flaking=findViewById(R.id.imageView_flaking);
-        flaking_click=findViewById(R.id.imageView_flaking);
-        flaking_click.setOnClickListener(new View.OnClickListener() {
                                               @Override
                                               public void onClick(View view){
-                                                  current_image_flaking++;
-                                                  current_image_flaking=current_image_flaking % images_flaking.length;
-                                                  flaking.setImageResource(images_flaking[current_image_flaking]);
-
+                                                  if (togglers[3] == false) {
+                                                      togglers[3] = true;
+                                                      bleeding_click.setImageResource(R.drawable.bleeding_ticked);
+                                                  } else if (togglers[3] == true) {
+                                                      togglers[3] = false;
+                                                      bleeding_click.setImageResource(R.drawable.bleeding);
+                                                  }
                                               }
                                           }
         );
     }
 
+    public void buttonclick_flaking(){
+        flaking_click=findViewById(R.id.imageView_flaking);
+        if (togglers[4] == false) {
+            flaking_click.setImageResource(R.drawable.flaking);
+        } else if (togglers[4] == true) {
+            flaking_click.setImageResource(R.drawable.flaking_clicked);
+        }
+        flaking_click.setOnClickListener(new View.OnClickListener() {
+                                             @Override
+                                             public void onClick(View view){
+                                                 if (togglers[4] == false) {
+                                                     togglers[4] = true;
+                                                     flaking_click.setImageResource(R.drawable.flaking_clicked);
+                                                 } else if (togglers[4] == true) {
+                                                     togglers[4] = false;
+                                                     flaking_click.setImageResource(R.drawable.flaking);
+                                                 }
+                                             }
+                                         }
+        );
+    }
+
     public void buttonclick_itchy(){
-        itchy=findViewById(R.id.imageView_itchy);
         itchy_click=findViewById(R.id.imageView_itchy);
+        if (togglers[5] == false) {
+            itchy_click.setImageResource(R.drawable.itchy);
+        } else if (togglers[5] == true) {
+            itchy_click.setImageResource(R.drawable.itchy_ticked);
+        }
         itchy_click.setOnClickListener(new View.OnClickListener() {
                                            @Override
                                            public void onClick(View view){
-                                               current_image_itchy++;
-                                               current_image_itchy=current_image_itchy % images_itchy.length;
-                                               itchy.setImageResource(images_itchy[current_image_itchy]);
-
+                                               if (togglers[5] == false) {
+                                                   togglers[5] = true;
+                                                   itchy_click.setImageResource(R.drawable.itchy_ticked);
+                                               } else if (togglers[5] == true) {
+                                                   togglers[5] = false;
+                                                   itchy_click.setImageResource(R.drawable.itchy);
+                                               }
                                            }
                                        }
         );
     }
 
     public void buttonclick_medicine(){
-        medicine=findViewById(R.id.imageView_medicine);
         medicine_click=findViewById(R.id.imageView_medicine);
+        if (togglers[6] == false) {
+            medicine_click.setImageResource(R.drawable.medicine);
+        } else if (togglers[6] == true) {
+            medicine_click.setImageResource(R.drawable.medicine_clicked);
+        }
         medicine_click.setOnClickListener(new View.OnClickListener() {
-                                           @Override
-                                           public void onClick(View view){
-                                               current_image_medicine++;
-                                               current_image_medicine=current_image_medicine % images_medicine.length;
-                                               medicine.setImageResource(images_medicine[current_image_medicine]);
-
-                                           }
-                                       }
-        );
-    }
-
-    public void buttonclick_ointment() {
-        ointment = findViewById(R.id.imageView_ointment);
-        ointment_click = findViewById(R.id.imageView_ointment);
-        ointment_click.setOnClickListener(new View.OnClickListener() {
                                               @Override
-                                              public void onClick(View view) {
-                                                  current_image_ointment++;
-                                                  current_image_ointment = current_image_ointment % images_ointment.length;
-                                                  ointment.setImageResource(images_ointment[current_image_ointment]);
-
+                                              public void onClick(View view){
+                                                  if (togglers[6] == false) {
+                                                      togglers[6] = true;
+                                                      medicine_click.setImageResource(R.drawable.medicine_clicked);
+                                                  } else if (togglers[6] == true) {
+                                                      togglers[6] = false;
+                                                      medicine_click.setImageResource(R.drawable.medicine);
+                                                  }
                                               }
                                           }
         );
     }
-        public String getScore(){
-            String score="";
-            if (current_image==0){score=score+'0';}else{score=score+'1';}
-            if (current_image_oozing==0){score=score+'0';}else{score=score+'1';}
-            if (current_image_itchy==0){score=score+'0';}else{score=score+'1';}
-            if (current_image_flaking==0){score=score+'0';}else{score=score+'1';}
-            if (current_image_dry==0){score=score+'0';}else{score=score+'1';}
-            if (current_image_bleeding==0){score=score+'0';}else{score=score+'1';}
-            return score;
+
+    public void buttonclick_ointment(){
+        ointment_click=findViewById(R.id.imageView_ointment);
+        if (togglers[7] == false) {
+            ointment_click.setImageResource(R.drawable.ointment);
+        } else if (togglers[7] == true) {
+            ointment_click.setImageResource(R.drawable.ointment_clicked);
         }
+        ointment_click.setOnClickListener(new View.OnClickListener() {
+                                              @Override
+                                              public void onClick(View view){
+                                                  if (togglers[7] == false) {
+                                                      togglers[7] = true;
+                                                      ointment_click.setImageResource(R.drawable.ointment_clicked);
+                                                  } else if (togglers[7] == true) {
+                                                      togglers[7] = false;
+                                                      ointment_click.setImageResource(R.drawable.ointment);
+                                                  }
+                                              }
+                                          }
+        );
     }
+
+    public String getScore(){
+        String score="";
+        if (togglers[0]==false){score=score+'0';}else{score=score+'1';}
+        if (togglers[1]==false){score=score+'0';}else{score=score+'1';}
+        if (togglers[2]==false){score=score+'0';}else{score=score+'1';}
+        if (togglers[3]==false){score=score+'0';}else{score=score+'1';}
+        if (togglers[4]==false){score=score+'0';}else{score=score+'1';}
+        if (togglers[5]==false){score=score+'0';}else{score=score+'1';}
+        if (togglers[6]==false){score=score+'0';}else{score=score+'1';}
+        if (togglers[7]==false){score=score+'0';}else{score=score+'1';}
+
+
+        return score;
+    }
+}

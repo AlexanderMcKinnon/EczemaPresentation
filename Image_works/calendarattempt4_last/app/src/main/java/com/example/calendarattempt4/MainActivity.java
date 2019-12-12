@@ -5,13 +5,28 @@ import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.Viewport;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.widget.CalendarView;
+import android.widget.TextView;
+
+import java.util.Random;
 
 import android.view.View;
 
@@ -39,6 +54,7 @@ import static java.time.LocalDate.now;
 
 public class MainActivity extends AppCompatActivity {
 
+
     private AppBarConfiguration mAppBarConfiguration;
 
     private TextView thedate;
@@ -51,11 +67,19 @@ public class MainActivity extends AppCompatActivity {
     static day D = new day();
     static Date nowday = Calendar.getInstance().getTime();
 
+    private static final Random RANDOM = new Random();
+    protected LineGraphSeries<DataPoint> series;
+    private int lastX = 0;
+    private double[]  x_array = new double[300];
+    private double[]  y_array = new double[300];
+
     public void main(String[] args) throws SQLException, IOException {
 
     }
 
     public Database getDB(){return this.db;}
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +91,11 @@ public class MainActivity extends AppCompatActivity {
             P.connect(s);
             try {
                 selectChild_button(1);
-                checkDay_on_state_change(nowday);
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                String date_chosen = sdf.format(nowday);
 
+
+                checkDay_on_state_change(date_chosen);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -124,6 +151,23 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        // we get graph view instance
+
+        GraphView graph = (GraphView) findViewById(R.id.graph);
+        // data
+        series = new LineGraphSeries<DataPoint>();
+        graph.addSeries(series);
+        // customize a little bit viewport
+        Viewport viewport = graph.getViewport();
+        viewport.setYAxisBoundsManual(true);
+        viewport.setMinY(0);
+        viewport.setMaxY(12);
+        viewport.setMinX(00);
+        viewport.setMaxX(50);
+        viewport.setScrollable(true);
+        viewport.setScalable(true);
+        graph.getGridLabelRenderer().setHorizontalAxisTitle("Weeks");
+        graph.getGridLabelRenderer().setVerticalAxisTitle("Severity of Eczema (POEM)");
     }
 
     @Override
@@ -149,6 +193,43 @@ public class MainActivity extends AppCompatActivity {
         ResultSet rset=s.executeQuery(sqlStr);
         while(rset.next()) {i=rset.getInt("DID");}
         return i;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // we're going to simulate real time with thread that append data to the graph
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                // we add 100 new entries
+                for (int i = 0; i < 50; i++) {
+                    runOnUiThread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            addEntry();
+                        }
+                    });
+
+                    // sleep to slow down the add of entries
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        // manage error ...
+                    }
+                }
+            }
+        }).start();
+    }
+
+    // add random data to graph
+    private void addEntry() {
+        // here, we choose to display max 10 points on the viewport and we scroll to end
+        //series.appendData(new DataPoint(lastX++, RANDOM.nextDouble() * 10d), false, 50);
+        series.appendData(new DataPoint(lastX++, RANDOM.nextDouble() * 10d), false, 50);
+
     }
 
     private static void signup_button(String userName_from_app, String password_from_app, String email_from_app) throws SQLException {
@@ -178,12 +259,14 @@ public class MainActivity extends AppCompatActivity {
         child_num_from_app = 1;
         C.connect(s, P.parent_ID, child_num_from_app);
     }
-    public static void checkDay_on_state_change(Date Day_ID) throws SQLException {
+    public static boolean checkDay_on_state_change(String Day_ID) throws SQLException {
         if (D.check(C.child_ID, P.parent_ID, Day_ID, s)){
             System.out.println("Answers for selected date:\t" + D.answers);
             // displays at editText on Android Studio
+            return true;
         } else {
             System.out.println("This day is empty");
+            return false;
         }
     }
     public static void makeDay(String newAnswers) throws SQLException {

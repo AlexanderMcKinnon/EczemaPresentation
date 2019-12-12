@@ -7,20 +7,21 @@ public class day {
     protected int Day_ID;
     protected int parent_ID;
     protected int child_ID;
-    protected Date date;
+    protected String date;
     protected String answers;
-    String AUTH = null;
+    protected String AUTH = null;
     Statement s;
 
     public day(){
     }
 
-    public boolean check(int CID, int PID, Date date, Statement s) throws SQLException {
+    public boolean check(int CID, int PID, String date, Statement s) throws SQLException {
+        AUTH = null;
         this.s = s;
         this.parent_ID = PID;
         this.child_ID = CID;
         this.date = date;
-        String sqlStr = "SELECT * FROM dates WHERE CID =\'"+CID+"\' and DID =\'"+date+"\';";
+        String sqlStr = "SELECT * FROM dates WHERE CID =\'"+CID+"\' and date =\'"+date+"\';";
         ResultSet rset=s.executeQuery(sqlStr);
         while(rset.next()) {
             this.Day_ID = rset.getInt("DID");
@@ -28,10 +29,14 @@ public class day {
             this.child_ID = rset.getInt("CID");
             this.date = date;
             this.answers = rset.getString("Record");
+            AUTH = rset.getString("DID");
+            this.answers = rset.getString("Record");
+
         }
-        if (this.answers != null){
+        if (AUTH != null){
             return true;
         } else {
+            this.answers = "00000000";
             return false;
         }
     }
